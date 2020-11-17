@@ -18,10 +18,14 @@ TEN_THOUSAND = 10000
 THOUSAND_FIVE_HUNDRED = 1500
 
 
-def driver(inputfile, protocol, characteristic, size, time, error, output, force):
+def driver(inputfile, protocol, characteristic, size, time, error, output, force, present_time):
     
     with open(inputfile, 'rb') as t:
         header_feat = t.readline().rstrip().decode("utf-8").split(',')
+        try:
+            host_col_pos = str(header_feat.index('host')+1)
+        except:
+            host_col_pos = 0
         try:
             pref_col_pos = str(header_feat.index('new_cidr')+1)
         except:
@@ -35,12 +39,15 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
         except:
             ver_col_pos = 0
     
+    if host_col_pos == 0:
+        print('***ERROR*** Host information is missing (IP column should be named as host)')
+        return
+    
     if time != 0:
-        present_time = datetime.datetime.fromtimestamp(int(time.time()))
-        past_time = datetime.datetime.fromtimestamp(past)
+        past_time = datetime.datetime.fromtimestamp(time)
         rd = dateutil.relativedelta.relativedelta (present_time,past_time)
         if rd.months > 2:
-            print('A fresh scan is recommended to better capture the Internet behaviour but hitlist is still generated for the given input')
+            print('***WARNING*** A fresh scan is recommended to better capture the Internet behaviour but hitlist is being generated for the given input')
         
         
         
@@ -68,6 +75,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Protocol Version detail)')
+                        return
                    
                 elif error == 2:
                     if ver_col_pos != 0:
@@ -76,6 +84,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Protocol Version details)')
+                        return
                                              
                 elif error >= 5:
                     if ver_col_pos != 0:
@@ -88,6 +97,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                     
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require either Protocol Version or Prefix Length details)')
+                        return
                         
             else:
                 if ver_col_pos != 0:
@@ -100,6 +110,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                     
                 else:
                     print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require either Protocol Version or Prefix Length details) or mentioned size do not perform well')
+                    return
 ##################                        
         elif characteristic == 'no_null_version':
             if size == 0:
@@ -110,6 +121,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Protocol Version detail)')
+                        return
                    
                 elif 2 <= error <= 5:
                     if ver_col_pos != 0:
@@ -118,6 +130,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Protocol Version details)')
+                        return
                                              
                 elif error > 5:
                     if ver_col_pos != 0:
@@ -126,6 +139,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                     
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require either Protocol Version or Prefix Length details)')
+                        return
                         
             else:
                 if ver_col_pos != 0 and size >= TEN_THOUSAND:
@@ -134,6 +148,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                     
                 else:
                     print('***ERROR*** Either elevant information to perform stratified sampling is missing (Require Protocol Version details) or mentioned size do not perform well')
+                    return
 ##################                        
         elif characteristic == 'all_prefix-length':
             if size == 0:
@@ -145,6 +160,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length detail)')
+                        return
                    
                 elif 2 <= error <= 5:
                     if pref_col_pos != 0:
@@ -154,6 +170,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                                              
                 elif error > 5:
                     if pref_col_pos != 0:
@@ -163,6 +180,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                     
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                         
             else:
                 if pref_col_pos != 0 and size >= HUNDRED_THOUSAND:
@@ -171,7 +189,8 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         os.system('rm char_samp')
                     
                 else:
-                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')            
+                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')
+                    return
 ##################                        
         elif characteristic == 'routable_prefix-length':
             if size == 0:
@@ -182,6 +201,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length detail)')
+                        return
                    
                 elif error >= 5:
                     if pref_col_pos != 0:
@@ -190,6 +210,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                         
             else:
                 if pref_col_pos != 0 and size >= TEN_THOUSAND:
@@ -197,7 +218,8 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         stratified_random_sampler('char_sort.csv', 'char_cum.csv', size, output)
                     
                 else:
-                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')  
+                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')
+                    return
 ##################                        
         elif characteristic == '24_prefix-length':
             if size == 0:
@@ -208,6 +230,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length detail)')
+                        return
                    
                 elif error >= 5:
                     if pref_col_pos != 0:
@@ -216,6 +239,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                         
             else:
                 if pref_col_pos != 0 and size >= TEN_THOUSAND:
@@ -223,7 +247,8 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         stratified_random_sampler('char_sort.csv', 'char_cum.csv', size, output)
                     
                 else:
-                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well') 
+                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')
+                    return
               
 ######################################################################################
     
@@ -238,6 +263,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length detail)')
+                        return
                    
                 elif error >= 5:
                     if pref_col_pos != 0:
@@ -247,6 +273,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                         
             else:
                 if pref_col_pos != 0 and size >= HUNDRED_THOUSAND:
@@ -255,7 +282,8 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         os.system('rm char_samp')
                     
                 else:
-                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')            
+                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')
+                    return
 ##################                        
         elif characteristic == 'routable_prefix-length':
             if size == 0:
@@ -270,6 +298,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require ASN or Prefix Length detail)')
+                        return
               
                 elif 2 <= error <= 5:
                     if pref_col_pos != 0:
@@ -278,6 +307,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                         
                 
                 elif error > 5:
@@ -287,6 +317,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                         
             else:
                 if pref_col_pos != 0 and size >= TEN_THOUSAND:
@@ -294,7 +325,8 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         stratified_random_sampler('char_sort.csv', 'char_cum.csv', size, output)
                     
                 else:
-                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')  
+                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')
+                    return
 ##################                        
         elif characteristic == '24_prefix-length':
             if size == 0:
@@ -305,6 +337,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length detail)')
+                        return
               
                 elif error == 2:
                     if pref_col_pos != 0:
@@ -313,6 +346,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length detail)')
+                        return
                    
                 elif error > 2:
                     if pref_col_pos != 0:
@@ -321,6 +355,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                         
             else:
                 if pref_col_pos != 0 and size >= TEN_THOUSAND:
@@ -328,7 +363,8 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         stratified_random_sampler('char_sort.csv', 'char_cum.csv', size, output)
                     
                 else:
-                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well') 
+                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')
+                    return
               
 ######################################################################################
     
@@ -343,6 +379,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length detail)')
+                        return
                    
                 elif error >= 5:
                     if pref_col_pos != 0:
@@ -352,6 +389,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                         
             else:
                 if pref_col_pos != 0 and size >= HUNDRED_THOUSAND:
@@ -360,7 +398,8 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         os.system('rm char_samp')
                     
                 else:
-                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')            
+                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')
+                    return
 ##################                        
         elif characteristic == 'routable_prefix-length':
             if size == 0:
@@ -371,6 +410,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
 
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require ASN or Prefix Length detail)')
+                        return
               
                 elif 2 <= error <= 5:
                     if pref_col_pos != 0:
@@ -379,6 +419,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                         
                 
                 elif error > 5:
@@ -388,6 +429,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                         
             else:
                 if pref_col_pos != 0 and size >= TEN_THOUSAND:
@@ -395,7 +437,8 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         stratified_random_sampler('char_sort.csv', 'char_cum.csv', size, output)
                     
                 else:
-                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')  
+                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')
+                    return
 ##################                        
         elif characteristic == '24_prefix-length':
             if size == 0:
@@ -406,6 +449,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length detail)')
+                        return
               
                 elif error == 2:
                     if pref_col_pos != 0:
@@ -414,6 +458,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length detail)')
+                        return
                    
                 elif error > 2:
                     if pref_col_pos != 0:
@@ -422,6 +467,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
                     else:
                         print('***ERROR*** Relevant information to perform stratified sampling is missing (Require Prefix Length details)')
+                        return
                         
             else:
                 if pref_col_pos != 0 and size >= TEN_THOUSAND:
@@ -429,7 +475,8 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         stratified_random_sampler('char_sort.csv', 'char_cum.csv', size, output)
                     
                 else:
-                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well') 
+                    print('***ERROR*** Either relevant information to perform stratified sampling is missing (Require Prefix Length details) or mentioned size do not perform well')
+                    return
                     
     if force != 'random' or characteristic != 'cross_response':
         os.system('rm char_sort.csv char_cum.csv')
@@ -454,7 +501,7 @@ def main():
     parser.add_argument("--out", dest='output', help="Directs the output to a name of your choice",
                         type=str, default = 'ipv4_hitlist_output.csv')
     parser.add_argument("--t", dest='time', help="Time of scan (Epoch time)",
-                        type=int, default = 0)
+                        type =int, default = 0)
 
     args = parser.parse_args()   
     
@@ -466,8 +513,8 @@ def main():
         print('hitlist.py: error: the following arguments are required: --c')
         return
 
-
-    driver(args.inputfile, args.protocol, args.characteristic, args.size, args.time, args.error, args.output, args.force)
+    present_time = datetime.datetime.fromtimestamp(time.time())
+    driver(args.inputfile, args.protocol, args.characteristic, args.size, args.time, args.error, args.output, args.force, present_time)
 
 
 if __name__ == '__main__':
