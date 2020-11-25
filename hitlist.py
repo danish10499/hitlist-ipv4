@@ -27,7 +27,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
         except:
             host_col_pos = 0
         try:
-            pref_col_pos = str(header_feat.index('new_cidr')+1)
+            pref_col_pos = str(header_feat.index('prefix_length')+1)
         except:
             pref_col_pos = 0
         try:
@@ -243,7 +243,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
             else:
                 if pref_col_pos != 0 and size >= TEN_THOUSAND:
-                        subprocess.check_call(['./bash_input.sh', inputfile, ver_col_pos])
+                        subprocess.check_call(['./bash_input.sh', inputfile, pref_col_pos])
                         stratified_random_sampler('char_sort.csv', 'char_cum.csv', size, output)
                     
                 else:
@@ -277,7 +277,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
             else:
                 if pref_col_pos != 0 and size >= HUNDRED_THOUSAND:
-                        subprocess.check_call(['./bash_input.sh', inputfile, ver_col_pos])
+                        subprocess.check_call(['./bash_input.sh', inputfile, pref_col_pos])
                         cluster_sampler('char_sort.csv', 'char_cum.csv', 'char_samp', size, output)
                         os.system('rm char_samp')
                     
@@ -321,7 +321,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
             else:
                 if pref_col_pos != 0 and size >= TEN_THOUSAND:
-                        subprocess.check_call(['./bash_input.sh', inputfile, ver_col_pos])
+                        subprocess.check_call(['./bash_input.sh', inputfile, pref_col_pos])
                         stratified_random_sampler('char_sort.csv', 'char_cum.csv', size, output)
                     
                 else:
@@ -359,7 +359,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
             else:
                 if pref_col_pos != 0 and size >= TEN_THOUSAND:
-                        subprocess.check_call(['./bash_input.sh', inputfile, ver_col_pos])
+                        subprocess.check_call(['./bash_input.sh', inputfile, pref_col_pos])
                         stratified_random_sampler('char_sort.csv', 'char_cum.csv', size, output)
                     
                 else:
@@ -393,7 +393,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
             else:
                 if pref_col_pos != 0 and size >= HUNDRED_THOUSAND:
-                        subprocess.check_call(['./bash_input.sh', inputfile, ver_col_pos])
+                        subprocess.check_call(['./bash_input.sh', inputfile, pref_col_pos])
                         cluster_sampler('char_sort.csv', 'char_cum.csv', 'char_samp', size, output)
                         os.system('rm char_samp')
                     
@@ -433,7 +433,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
             else:
                 if pref_col_pos != 0 and size >= TEN_THOUSAND:
-                        subprocess.check_call(['./bash_input.sh', inputfile, ver_col_pos])
+                        subprocess.check_call(['./bash_input.sh', inputfile, pref_col_pos])
                         stratified_random_sampler('char_sort.csv', 'char_cum.csv', size, output)
                     
                 else:
@@ -471,7 +471,7 @@ def driver(inputfile, protocol, characteristic, size, time, error, output, force
                         
             else:
                 if pref_col_pos != 0 and size >= TEN_THOUSAND:
-                        subprocess.check_call(['./bash_input.sh', inputfile, ver_col_pos])
+                        subprocess.check_call(['./bash_input.sh', inputfile, pref_col_pos])
                         stratified_random_sampler('char_sort.csv', 'char_cum.csv', size, output)
                     
                 else:
